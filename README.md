@@ -4,20 +4,15 @@ schedule
 This module installs fpsync which is a transfer utility that comes bundled
 with the fpart application. This module will simply ensure
 that fpart is install and by proxy fpsync is available and provide a
-mechanism to schedule jobs.
+mechanism to schedule jobs via crontab.
 
 
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with fpsync](#setup)
-    * [What fpsync affects](#what-fpsync-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with fpsync](#beginning-with-fpsync)
-3. [Usage - Configuration options and additional functionality](#usage)
-4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
-5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
+3. [Usage](#usage)
+5. [Limitations](#limitations)
+6. [Development](#development)
 
 ## Description
 
@@ -29,9 +24,6 @@ fpsync synchronize directories in parallel using fpart and rsync.
 The job define type will orchestrate the the configuration of data
 synchronization jobs. This scheduler leverages the cron utility in
 puppet in order to run the fpsync job on the desired interval.
-
-## Setup
-
 
 ### Prerequisites
 
@@ -45,12 +37,11 @@ available for scheduling cron jobs.
 
 ## Usage
 
-### Install and enable NTP
+### Install fpsync
 
 ```puppet
 include fpsync
 ```
-## Reference
 
 ### fpsync jobs
 
@@ -77,22 +68,13 @@ fpsync::job:
     hour: 1
     minute: 0
 ```
+More details about classes here:
 
-* If you are not using Puppet Strings, include a list of all of your classes, defined types, and so on, along with their parameters. Each element in this listing should include:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
+[a INFO](doc/INFO.md)
 ## Limitations
 
-This is where you list OS compatibility, version compatibility, etc. If there are Known Issues, you might want to include them under their own heading here.
+This module is designed for a CentOS 7 environment. Please feel free to make it work for your needs by contributing to this code base.
 
 ## Development
 
-Since your module is awesome, other users will want to play with it. Let them know what the ground rules for contributing are.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+Feel free to add feature and contribute to this module.
