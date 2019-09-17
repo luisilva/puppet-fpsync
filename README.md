@@ -68,9 +68,7 @@ fpsync::job:
     hour: 1
     minute: 0
 ```
-More details about classes here:
-
-[a INFO](doc/INFO.md)
+More details about classes here: [INFO](INFO.md)
 ## Limitations
 
 This module is designed for a CentOS 7 environment. Please feel free to make it work for your needs by contributing to this code base.
