@@ -1,14 +1,10 @@
-
+schedule
 # fpsync
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
-
-
-
-
-
+This module installs fpsync which is a transfer utility that comes bundled
+with the fpart application. This module will simply ensure
+that fpart is install and by proxy fpsync is available and provide a
+mechanism to schedule jobs.
 
 
 #### Table of Contents
@@ -25,41 +21,62 @@ The README template below provides a starting point with details about what info
 
 ## Description
 
-Start with a one- or two-sentence summary of what the module does and/or what problem it solves. This is your 30-second elevator pitch for your module. Consider including OS/Puppet version it works with.
+The fpart utility helps you sort file trees and pack them into bags
+(called "partitions").
 
-You can give more descriptive information in a second paragraph. This paragraph should answer the questions: "What does this module *do*?" and "Why would I use it?" If your module has a range of functionality (installation, configuration, management, etc.), this is the time to mention it.
+fpsync synchronize directories in parallel using fpart and rsync.
+
+The job define type will orchestrate the the configuration of data
+synchronization jobs. This scheduler leverages the cron utility in
+puppet in order to run the fpsync job on the desired interval.
 
 ## Setup
 
-### What fpsync affects **OPTIONAL**
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
+### Prerequisites
 
-If there's more that they should know about, though, this is the place to mention:
-
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+This has been tested with `'torrancew/cron', '0.1.0'`. This most
+cron modules use very similar parameters.
 
 ### Beginning with fpsync
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+including this module will ensure that fpart is install making fpsync
+available for scheduling cron jobs.
 
 ## Usage
 
-This section is where you describe how to customize, configure, and do the fancy stuff with your module here. It's especially helpful if you include usage examples and code samples for doing things with your module.
+### Install and enable NTP
 
+```puppet
+include fpsync
+```
 ## Reference
 
-Users need a complete list of your module's classes, types, defined types providers, facts, and functions, along with the parameters for each. You can provide this list either via Puppet Strings code comments or as a complete list in the README Reference section.
+### fpsync jobs
 
-* If you are using Puppet Strings code comments, this Reference section should include Strings information so that your users know how to access your documentation.
+* Using job defined type to schedule a cron job to repeatedly attempt file
+synchronization.
+#### puppet
+```puppet
+class { 'fpsync::job':
+    source      => '/mnt/source'
+    destination => '/backup/destination'
+    workers     => ['worker01','worker02']
+    hour        => 1
+    minute      => 0
+}
+```
+#### Hiera
+```yaml
+fpsync::job:
+    source: '/mnt/source'
+    destination: '/backup/destination'
+    workers:
+      - 'worker01'
+      - 'worker02'
+    hour: 1
+    minute: 0
+```
 
 * If you are not using Puppet Strings, include a list of all of your classes, defined types, and so on, along with their parameters. Each element in this listing should include:
 
