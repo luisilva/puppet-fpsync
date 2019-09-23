@@ -12,7 +12,7 @@ import logging
 import time
 import shlex
 import psutil
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
 
 
 class fpsync:
@@ -25,7 +25,7 @@ class fpsync:
         self.check_lock_file = self.check_lock_file()
         self.validate_args = self.validate_args()
         self.run_fpsync = self.run_fpsync()
-        '''self.send_exit_codes = self.send_exit_codes()'''
+        self.process_return_code = self.process_return_code()
         self.release_lock = self.release_lock()
 
     def check_lock_file(self):
@@ -41,6 +41,8 @@ class fpsync:
             if self.pid_active:
                 logger.critical("%s already exists, exiting with pid %s"
                             % (self.lock_file, self.pid))
+                self.rc = 2
+                self.process_return_code()
                 sys.exit()
         else:
             file(self.lock_file, 'w').write(self.pid)
@@ -125,10 +127,34 @@ class fpsync:
             print fp_out
         elif fp_err:
             logger.critical("error output: %s" % fp_err)
+        self.rc = fp_cmd.returncode
 
     def release_lock(self):
         logger.info("removing lock file: %s" % self.lock_file)
         os.remove(self.lock_file)
+
+    def process_return_code(self):
+        '''
+        Drop exit status in facter file for puppet reporting
+        '''
+        facts_dir = '/etc/facter/facts.d'
+        fact_file_name = self.arg_dict["nickname"] + ".yaml"
+        fact_file = os.path.join(facts_dir, fact_file_name)
+        logger.info("processing rc: %s" % self.rc)
+        if self.rc == 0:
+            logger.critical("exit 0")
+            with open(fact_file, "w") as f:
+                f.write("rsnap_%s_backup=success")
+        elif self.rc == 1:
+            logger.critical("exit 1")
+            with open(fact_file, "w") as f:
+                f.write("rsnap_%s_backup=failed")
+        elif self.rc == 2:
+            logger.critical("exit 2")
+            with open(fact_file, "w") as f:
+                f.write("rsnap_%s_backup=warnning")
+        else:
+            logger.critical("no exit code!")
 
     def parse_inputs(self):
         '''
@@ -146,7 +172,7 @@ class fpsync:
                             default=False,
                             help="source filesystem")
         parser.add_argument("-d", "--destination",
-                            required=False,
+                            required=True,
                             default=False,
                             help="destination directory")
         parser.add_argument("-n", "--nthreads",
