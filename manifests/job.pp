@@ -37,6 +37,8 @@
 # @param bytes_per_sync
 #   [Default: 4294967296 (4 GB)] maximum number of bytes per sync.
 # @param dir
+#   set fpsync shared dir to </dir/> (absolute path)
+#   This option is mandatory when using SSH workers.
 # @param temp_dir
 #   Temp directory that all the rsync logs go into. An empty value there
 #   will default to /tmp/fpsync i perfer the default go in /var/log so it's
